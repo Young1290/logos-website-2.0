@@ -9,7 +9,7 @@ import spaCreationImage from "../image/SPA creation.png";
 import youngPhoto from "../image/young.jpg";
 
 /* ── types ───────────────────────────────────────────────────────── */
-type PageKey = "mission" | "aequitas" | "pricing";
+type PageKey = "mission" | "aequitas" | "pricing" | "demo";
 type TxStage = "idle" | "exiting" | "entering";
 type BillMode = "monthly" | "annual";
 type Tweaks = { intensity: string; bg: string; density: string; showLDE: boolean };
@@ -23,14 +23,63 @@ const IMG = {
 const NAV = [
   { key: "mission" as PageKey, label: "Mission", href: "/" },
   { key: "aequitas" as PageKey, label: "Aequitas", href: "/aequitas" },
+  { key: "demo" as PageKey, label: "Demo", href: "/demo" },
   { key: "pricing" as PageKey, label: "Pricing", href: "/pricing" },
 ];
-const PAGE_TITLES: Record<PageKey, string> = { mission: "Mission", aequitas: "Aequitas", pricing: "Pricing" };
+const PAGE_TITLES: Record<PageKey, string> = { mission: "Mission", aequitas: "Aequitas", pricing: "Pricing", demo: "Demo" };
 
 function detectPage(p: string): PageKey {
   if (p === "/pricing") return "pricing";
   if (p === "/aequitas") return "aequitas";
+  if (p === "/demo") return "demo";
   return "mission";
+}
+
+function parseMoneyInput(value: string) {
+  const cleaned = value.replace(/[^0-9.]/g, "");
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function calcLegalFee(amount: number) {
+  if (amount <= 0) return 0;
+  const firstTier = Math.min(amount, 500_000) * 0.0125;
+  const secondTierBase = Math.max(Math.min(amount - 500_000, 7_000_000), 0);
+  const secondTier = secondTierBase * 0.01;
+  const remaining = Math.max(amount - 7_500_000, 0);
+  const estimatedNegotiableTier = remaining * 0.01;
+  return firstTier + secondTier + estimatedNegotiableTier;
+}
+
+function calcTransferStampDuty(amount: number) {
+  if (amount <= 0) return 0;
+  const first = Math.min(amount, 100_000) * 0.01;
+  const secondBase = Math.max(Math.min(amount - 100_000, 400_000), 0);
+  const second = secondBase * 0.02;
+  const thirdBase = Math.max(Math.min(amount - 500_000, 500_000), 0);
+  const third = thirdBase * 0.03;
+  const fourth = Math.max(amount - 1_000_000, 0) * 0.04;
+  return first + second + third + fourth;
+}
+
+function calcLoanStampDuty(loanAmount: number) {
+  if (loanAmount <= 0) return 0;
+  return Math.ceil(loanAmount * 0.005);
+}
+
+function calcMonthlyInstallment(loanAmount: number, annualRate: number, years: number) {
+  if (loanAmount <= 0 || annualRate <= 0 || years <= 0) return 0;
+  const monthlyRate = annualRate / 100 / 12;
+  const totalMonths = years * 12;
+  const factor = Math.pow(1 + monthlyRate, totalMonths);
+  return (loanAmount * monthlyRate * factor) / (factor - 1);
+}
+
+function formatMoney(amount: number) {
+  return new Intl.NumberFormat("en-MY", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 /* ── MagBtn ──────────────────────────────────────────────────────── */
@@ -503,21 +552,21 @@ function MissionPage({ tweaks }: { tweaks: Tweaks }) {
 function AequitasPage() {
   return (
     <main>
+      {/* ── Hero ── */}
       <section className="hero hero-aq wrap">
         <ParticleBg r={235} g={98} b={0} />
         <div className="hcopy" style={{ position:"relative", zIndex:2 }}>
           <div className="stagger">
             <SI d={40}><div className="tech-tag"><span className="dot" />&nbsp;TRIAL STAGE ACTIVE — Q2 2025</div></SI>
-            <SI d={60}><span className="chip">Aequitas Legal OS</span></SI>
-            <SI d={140}>
+            <SI d={120}>
               <h1 className="dh">
                 <span className="ln">The First</span>
                 <span className="ln ac">Integrated</span>
                 <span className="ln">Legal OS.</span>
               </h1>
             </SI>
-            <SI d={260}><p className="hbody">From fragmented documents to a unified, high-velocity intelligence ecosystem. Zero hallucination. 100% traceable. Financial-grade reliability.</p></SI>
-            <SI d={360}>
+            <SI d={240}><p className="hbody">From fragmented documents to a unified intelligence ecosystem. Zero hallucination. 100% traceable. Financial-grade reliability.</p></SI>
+            <SI d={340}>
               <div className="hctas">
                 <MagBtn cls="bp">Start Free Trial</MagBtn>
                 <MagBtn cls="bg">Watch Demo</MagBtn>
@@ -538,17 +587,13 @@ function AequitasPage() {
             <p className="spdlbl">Automation Speed</p>
             <strong className="spdval">94.2% Faster</strong>
             <span>SPA generation and compliance checks in seconds, not hours.</span>
-            <div style={{ marginTop:"12px", display:"flex", gap:"16px" }}>
-              <span className="aq-mono" style={{ color:"rgba(255,153,80,.55)" }}>SYS_VER 2.0.4</span>
-              <span className="aq-mono" style={{ color:"rgba(255,153,80,.55)" }}>UPTIME 99.97%</span>
-            </div>
           </div>
         </div>
       </section>
 
+      {/* ── Features (Bento) ── */}
       <Reveal className="bento wrap">
         <div className="bhead">
-          <div className="tech-tag"><span className="dot" />&nbsp;FEATURE MODULE — LIVE</div>
           <h2 className="sh">The New Standard<br />for <em>Legal Ops.</em></h2>
           <p>We dismantled the traditional conveyancing workflow to rebuild it for the AI era.</p>
         </div>
@@ -557,17 +602,16 @@ function AequitasPage() {
             <div className="bswrap">
               <img src={IMG.spa} alt="SPA creation" className="bshot spa" />
             </div>
-            <div className="bico">[]</div>
+            <div className="bico">⬡</div>
             <h3>Dynamic SPA Generation</h3>
-            <p>Our integrated engine pulls data points directly from verified sources to construct Sales and Purchase Agreements that are contextually aware and legally sound.</p>
-            <div className="bdots"><span /><span /><span /></div>
+            <p>Our integrated engine constructs Sales and Purchase Agreements from verified sources — contextually aware and legally sound, in seconds.</p>
             <small>Live Module</small>
           </article>
           <article className="bc bc-dk">
             <div className="bswrap cpt">
               <img src={IMG.approval} alt="Compliance review" className="bshot apv" />
             </div>
-            <div className="bico">()</div>
+            <div className="bico">◎</div>
             <h3>Continuous Compliance</h3>
             <p>Automated regulatory alignment checks running in the background. Never miss a clause change or statutory update again.</p>
             <div className="cbar"><div /></div>
@@ -585,51 +629,62 @@ function AequitasPage() {
             <div>
               <h3>Exclusive Trial Enrollment</h3>
               <p>Be among the first firms to pilot Aequitas OS. Limited slots for our Q4 cohort.</p>
-              <span className="tcta">Secure Your Slot</span>
+              <span className="tcta">Secure Your Slot →</span>
             </div>
           </article>
         </div>
       </Reveal>
 
-      <Reveal className="advsec wrap">
-        <aside className="advlist">
-          <h2 className="sh">The Curator's<br />Advantage</h2>
+      {/* ── Advantage ── */}
+      <Reveal className="aq-adv wrap">
+        <div className="aq-adv-hd">
+          <span className="slbl">Why Aequitas</span>
+          <h2 className="sh">The Curator's Advantage</h2>
+          <p>Three pillars that make Aequitas the only legal OS firms trust for high-stakes transactions.</p>
+        </div>
+
+        <div className="aq-cols">
           {[
-            { n:"01", l:"Infrastructure", d:"Cloud-native, zero-trust security for sensitive legal data." },
-            { n:"02", l:"Intelligence",   d:"Proprietary LLM layers tuned for real estate law." },
-            { n:"03", l:"Integration",    d:"Connects seamlessly with land registries and financial portals." },
+            { n:"01", l:"Infrastructure", d:"Cloud-native, zero-trust architecture purpose-built for sensitive legal and financial data." },
+            { n:"02", l:"Intelligence",   d:"Proprietary LLM layers fine-tuned on real estate law, conveyancing statutes, and land registry data." },
+            { n:"03", l:"Integration",    d:"Connects directly to land registries, financial portals, and compliance databases in real-time." },
           ].map(({ n, l, d }) => (
-            <div key={n} className="advitem" style={{ alignItems:"center" }}>
+            <div key={n} className="aq-col">
               <div className="adv-bignum">{n}</div>
-              <div><p className="advlbl">{l}</p><small>{d}</small></div>
+              <p className="advlbl">{l}</p>
+              <p>{d}</p>
             </div>
           ))}
-        </aside>
-        <div className="dpanels">
-          <article className="dpan">
-            <h3>Revolutionizing the SPA Workflow</h3>
-            <p>The Sales and Purchase Agreement is no longer a static document. In Aequitas, it is a Living Data Object — tracked in real-time, cross-referenced with compliance databases, and optimized with the latest precedents. Without human error.</p>
-            <div className="dstats dstats-4">
-              <div><strong>0s</strong><span>Hallucination Rate</span></div>
-              <div><strong>100%</strong><span>Traceable Logic</span></div>
-              <div><strong>&lt;2s</strong><span>Generation Time</span></div>
-              <div><strong>∞</strong><span>Scalability</span></div>
-            </div>
-          </article>
-          <article className="dpan warm">
-            <h3>Advanced Legal Automation</h3>
-            <p>Automation in Aequitas goes beyond fill-in-the-blanks. We use contextual awareness to understand the nuances of each transaction — from residential strata titles to complex commercial holdings.</p>
-          </article>
         </div>
+
+        <div className="aq-kpi">
+          {[
+            { v:"0s",    label:"Hallucination Rate" },
+            { v:"100%",  label:"Traceable Logic" },
+            { v:"<2s",   label:"Generation Time" },
+            { v:"∞",     label:"Scalability" },
+          ].map(({ v, label }) => (
+            <div key={label} className="aq-kpi-cell">
+              <strong>{v}</strong>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <article className="dpan warm">
+          <h3>The SPA as a Living Data Object</h3>
+          <p>In Aequitas, every Sales and Purchase Agreement is tracked in real-time, cross-referenced with compliance databases, and optimized with the latest precedents — without human error.</p>
+        </article>
       </Reveal>
 
-      <Reveal className="ctaband dk wrap">
+      {/* ── CTA ── */}
+      <Reveal className="ctaband wrap">
         <div className="ctain">
           <div className="ctacopy">
             <h2>Ready to curate<br />the future of law?</h2>
             <p>Join the Aequitas trial today and redefine your firm's operational velocity.</p>
           </div>
-          <MagBtn cls="bp">Try Our Package</MagBtn>
+          <MagBtn cls="bw">Start Free Trial</MagBtn>
         </div>
       </Reveal>
     </main>
@@ -704,6 +759,133 @@ function PricingPage() {
             <article key={q} className="fqc"><h3>{q}</h3><p>{a}</p></article>
           ))}
         </div>
+      </Reveal>
+    </main>
+  );
+}
+
+function DemoPage() {
+  const [purchaseInput, setPurchaseInput] = useState("1000000");
+  const [marginInput, setMarginInput] = useState("90");
+  const [interestInput, setInterestInput] = useState("4.2");
+  const [tenureInput, setTenureInput] = useState("30");
+
+  const purchasePrice = parseMoneyInput(purchaseInput);
+  const margin = parseMoneyInput(marginInput);
+  const interest = parseMoneyInput(interestInput);
+  const tenure = parseMoneyInput(tenureInput);
+  const loanAmount = purchasePrice * (margin / 100);
+  const legalFee = calcLegalFee(purchasePrice);
+  const transferStampDuty = calcTransferStampDuty(purchasePrice);
+  const loanStampDuty = calcLoanStampDuty(loanAmount);
+  const monthlyInstallment = calcMonthlyInstallment(loanAmount, interest, tenure);
+
+  return (
+    <main>
+      <section className="demohero wrap">
+        <div className="stagger">
+          <SI d={60}><span className="chip">Interactive Demo</span></SI>
+          <SI d={140}>
+            <h1 className="dh">
+              <span className="ln">Aequitas ChatAPI</span>
+              <span className="ln ac">Demo Suite</span>
+            </h1>
+          </SI>
+          <SI d={240}>
+            <p className="hbody ctr">
+              Explore the Aequitas ChatAPI, followed by the Malaysia stamp duty calculator for SPA,
+              transfer duty, loan duty, and home loan installment estimates.
+            </p>
+          </SI>
+        </div>
+      </section>
+
+      <Reveal className="demo-grid wrap">
+        <section className="demo-card demo-llm">
+          <div className="demo-card-head">
+            <span className="slbl">LLM API Demo</span>
+            <h2 className="sh">Aequitas ChatAPI</h2>
+          </div>
+          <p className="demo-placeholder-copy">
+            This panel is reserved for the Aequitas ChatAPI function. Once you send me the API
+            spec, I can wire it in here as the first demo tool before the Malaysia calculator.
+          </p>
+          <div className="llm-placeholder">
+            <div className="llm-pill">Awaiting API Details</div>
+            <div className="llm-terminal">
+              <span className="llm-line">tool: aequitas_chat_api</span>
+              <span className="llm-line">status: ready_to_connect</span>
+              <span className="llm-line">input_schema: pending</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="demo-card demo-form">
+          <div className="demo-card-head">
+            <span className="slbl">Property Inputs</span>
+            <h2 className="sh">Malaysia Property Cost Estimator</h2>
+          </div>
+
+          <div className="calc-grid">
+            <label className="calc-field">
+              <span>Property Purchase Price (RM)</span>
+              <input value={purchaseInput} onChange={(e) => setPurchaseInput(e.target.value)} inputMode="decimal" />
+            </label>
+            <label className="calc-field">
+              <span>Margin of Finance (%)</span>
+              <input value={marginInput} onChange={(e) => setMarginInput(e.target.value)} inputMode="decimal" />
+            </label>
+            <label className="calc-field">
+              <span>Interest Rate (%)</span>
+              <input value={interestInput} onChange={(e) => setInterestInput(e.target.value)} inputMode="decimal" />
+            </label>
+            <label className="calc-field">
+              <span>Loan Tenure (Years)</span>
+              <input value={tenureInput} onChange={(e) => setTenureInput(e.target.value)} inputMode="decimal" />
+            </label>
+          </div>
+
+          <div className="calc-note">
+            Based on the calculator structure referenced from Low &amp; Partners:
+            first RM500,000 at 1.25%, next RM7,000,000 at 1%, transfer duty at 1% / 2% / 3% / 4% tiers,
+            and loan stamp duty at 0.5% rounded up.
+          </div>
+        </section>
+
+        <section className="demo-card demo-results">
+          <div className="demo-card-head">
+            <span className="slbl">Outputs</span>
+            <h2 className="sh">Demo Results</h2>
+          </div>
+
+          <div className="metric-list">
+            <div className="metric-row">
+              <span>Estimated Legal Fee (SPA / Loan Agreement)</span>
+              <strong>RM {formatMoney(legalFee)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>Transfer Stamp Duty</span>
+              <strong>RM {formatMoney(transferStampDuty)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>Loan Amount</span>
+              <strong>RM {formatMoney(loanAmount)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>Loan Stamp Duty</span>
+              <strong>RM {formatMoney(loanStampDuty)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>Monthly Installment</span>
+              <strong>RM {formatMoney(monthlyInstallment)}</strong>
+            </div>
+          </div>
+
+          <div className="calc-disclaimer">
+            Demo note: the above is an estimate for Malaysian / PR scenarios and does not include
+            disbursements or negotiated fee adjustments above RM7.5 million.
+          </div>
+        </section>
       </Reveal>
     </main>
   );
@@ -788,7 +970,6 @@ export default function App() {
               {disp === item.key && <span className="npip" />}
             </button>
           ))}
-          <button className="nb dim" type="button">Team</button>
         </nav>
         <span className="hdr-cta"><MagBtn cls="bp">Get Started</MagBtn></span>
         <button className={`ham ${drawer?"open":""}`} type="button"
@@ -806,7 +987,6 @@ export default function App() {
             <button key={item.key} className={`drw-lnk ${disp===item.key?"on":""}`}
               type="button" onClick={() => navigate(item)}>{item.label}</button>
           ))}
-          <button className="drw-lnk dim" type="button" style={{ opacity:.38 }}>Team</button>
           <div className="drw-cta"><MagBtn cls="bp">Get Started</MagBtn></div>
         </div>
       </div>
@@ -816,6 +996,7 @@ export default function App() {
         {disp === "mission"   && <MissionPage tweaks={tweaks} />}
         {disp === "aequitas"  && <AequitasPage />}
         {disp === "pricing"   && <PricingPage />}
+        {disp === "demo"      && <DemoPage />}
       </div>
 
       {/* Footer */}

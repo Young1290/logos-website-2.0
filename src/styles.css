@@ -457,6 +457,31 @@ em{font-style:normal;background:linear-gradient(115deg,var(--b1),var(--b3));
 .fqc p{font-size:.87rem;line-height:1.72;color:var(--bd)}
 
 /* ── FOOTER ──────────────────────────────────────────────────────── */
+.demohero{position:relative;overflow:hidden;padding:68px 0 34px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.demo-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:18px;padding:26px 0 80px}
+.demo-card{background:var(--sf-c);border:1px solid rgba(235,98,0,.08);border-radius:var(--rl);box-shadow:var(--ss);padding:32px 30px}
+.demo-form{grid-column:1}
+.demo-results{grid-column:2}
+.demo-llm{grid-column:1 / span 2}
+.demo-card-head{margin-bottom:24px}
+.demo-card-head .sh{font-size:clamp(1.6rem,3vw,2.3rem)}
+.calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.calc-field{display:flex;flex-direction:column;gap:8px}
+.calc-field span{font-size:.66rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--bd)}
+.calc-field input{width:100%;min-height:50px;padding:0 16px;border-radius:var(--r);border:1px solid rgba(235,98,0,.14);background:var(--sf-w);color:var(--ink);font:600 .98rem "Manrope",sans-serif;outline:none;transition:border-color 140ms ease, box-shadow 140ms ease, background 140ms ease}
+.calc-field input:focus{border-color:rgba(235,98,0,.35);box-shadow:0 0 0 4px rgba(235,98,0,.08);background:#fff}
+.calc-note,.calc-disclaimer,.demo-placeholder-copy{font-size:.9rem;line-height:1.7;color:var(--bd)}
+.calc-note{margin-top:18px;padding:14px 16px;border-radius:var(--r);background:rgba(235,98,0,.05)}
+.metric-list{display:flex;flex-direction:column;gap:12px}
+.metric-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-radius:var(--r);background:var(--sf-w)}
+.metric-row span{font-size:.82rem;color:var(--sec);line-height:1.5}
+.metric-row strong{flex-shrink:0;font-family:"Space Grotesk",sans-serif;font-size:1.15rem;letter-spacing:-.04em;color:var(--b1)}
+.calc-disclaimer{margin-top:18px;padding-top:18px;border-top:1px solid rgba(235,98,0,.10)}
+.llm-placeholder{display:grid;grid-template-columns:220px 1fr;gap:18px;margin-top:20px;align-items:start}
+.llm-pill{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:linear-gradient(135deg,var(--b0),var(--b2));color:#fff;font-size:.7rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.llm-terminal{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:var(--rm);background:var(--ink);box-shadow:var(--sm)}
+.llm-line{font-family:"Space Grotesk",sans-serif;font-size:.78rem;letter-spacing:.04em;color:rgba(255,240,228,.72)}
+
 .ftr{display:flex;align-items:center;justify-content:space-between;gap:24px;
   padding:36px 0 40px;border-top:1px solid rgba(235,98,0,.09);position:relative;z-index:1}
 .fword{font-family:"Space Grotesk",sans-serif;font-size:1.28rem;font-weight:700;
@@ -489,6 +514,30 @@ em{font-style:normal;background:linear-gradient(115deg,var(--b1),var(--b3));
 .twktr.on .twkth{translate:16px 0}
 .twktog span{font-size:.72rem;color:var(--bd)}
 
+/* ── AEQUITAS — redesigned advantage section ─────────────────────── */
+.aq-adv{padding:60px 0 80px}
+.aq-adv-hd{margin-bottom:44px}
+.aq-adv-hd p{margin-top:12px;font-size:1.0rem;color:var(--bd);max-width:560px;line-height:1.72}
+.aq-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:22px}
+.aq-col{padding:32px 28px;border-radius:var(--rm);background:var(--sf-c);box-shadow:var(--ss);
+  border:1px solid rgba(235,98,0,.07);border-top:2px solid rgba(235,98,0,.22);
+  transition:transform 200ms,box-shadow 200ms}
+.aq-col:hover{transform:translateY(-3px);box-shadow:var(--sm)}
+.aq-col .adv-bignum{font-size:2.4rem;margin-bottom:16px}
+.aq-col .advlbl{font-size:.63rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--b2);margin-bottom:6px}
+.aq-col p{font-size:.88rem;color:var(--bd);line-height:1.65}
+
+/* Aequitas KPI strip */
+.aq-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:rgba(235,98,0,.10);border-radius:var(--rm);overflow:hidden;margin-bottom:22px}
+.aq-kpi-cell{background:var(--sf-c);padding:24px 20px;text-align:center}
+.aq-kpi-cell strong{display:block;font-family:"Space Grotesk",sans-serif;font-size:2.2rem;
+  letter-spacing:-.06em;line-height:1;margin-bottom:5px;
+  background:linear-gradient(110deg,var(--b1),var(--b3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.aq-kpi-cell span{font-size:.58rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--bd)}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────────── */
 @media(max-width:960px){
   .hero,.agrid{grid-template-columns:1fr;gap:44px}
@@ -497,7 +546,10 @@ em{font-style:normal;background:linear-gradient(115deg,var(--b1),var(--b3));
   .hframe,.aframe{aspect-ratio:16/9}
   .abadge{position:static;margin-top:16px;max-width:100%}
   .fgrid{grid-template-columns:repeat(2,1fr)}
-  .bgrid,.advsec,.pgrid,.fqgrid,.lgrid{grid-template-columns:1fr}
+  .bgrid,.advsec,.pgrid,.fqgrid,.lgrid,.aq-cols,.demo-grid{grid-template-columns:1fr}
+  .demo-form,.demo-results,.demo-llm{grid-column:auto}
+  .llm-placeholder,.calc-grid{grid-template-columns:1fr}
+  .aq-kpi{grid-template-columns:repeat(2,1fr)}
   .pc.feat{transform:none}
   .ctain{flex-direction:column;text-align:center;padding:44px 32px}
   .lvis{height:300px}
