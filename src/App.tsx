@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import checkApprovalImage from "../image/CheckApproval.png";
 import chinHsienPhoto from "../image/Chin Hsien.jpg";
 import ldePhoto from "../image/LDE.jpg";
-import logoPhoto from "../image/logo.jpg";
+import logoSvg from "../image/logo.jpg";
 import mainAequitasImage from "../image/Main Aequitas.png";
 import spaCreationImage from "../image/SPA creation.png";
 import youngPhoto from "../image/young.jpg";
@@ -172,7 +172,9 @@ export default function App() {
 
       <header className="site-header">
         <button className="brand" onClick={() => navigate(navItems[0])} type="button">
-          <span className="brand-logo">L</span>
+          <span className="brand-logo">
+            <img src={logoSvg} alt="Logos AI" />
+          </span>
           Logos AI
         </button>
         <nav className="site-nav">
@@ -380,7 +382,7 @@ function MissionPage() {
       <RevealSection className="about-section">
         <div className="about-img-col">
           <div className="about-img-wrap">
-            <img src={logoPhoto} alt="Logos AI logo" className="about-img" />
+            <img src={logoSvg} alt="Logos AI logo" className="about-img" />
           </div>
           <div className="about-badge">
             <strong>Jan 2026</strong>
