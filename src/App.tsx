@@ -101,7 +101,7 @@ function MagBtn({ cls, children }: { cls: string; children: ReactNode }) {
 }
 
 /* ── Reveal ──────────────────────────────────────────────────────── */
-function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
+function Reveal({ children, className = "", style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   const ref = useRef<HTMLElement>(null);
   const [v, setV] = useState(false);
   useEffect(() => {
@@ -110,7 +110,7 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
     obs.observe(n);
     return () => obs.disconnect();
   }, []);
-  return <section ref={ref} className={`rv ${v ? "in" : ""} ${className}`}>{children}</section>;
+  return <section ref={ref} className={`rv ${v ? "in" : ""} ${className}`} style={style}>{children}</section>;
 }
 
 /* ── SI (stagger item) ───────────────────────────────────────────── */
