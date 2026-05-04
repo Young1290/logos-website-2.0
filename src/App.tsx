@@ -427,8 +427,8 @@ const founders = [
 ];
 
 const pricingTiers = [
-  { title:"Standard",     mo:"RM1000",  yr:"RM9600",  desc:"Essential intelligence tools for boutique practices focused on precision.",           pts:["Access to Core Aequitas Database","Up to 5 User Accounts","Standard Query Velocity"],                                                   btn:"Start Free Trial" },
-  { title:"Professional", mo:"RM2000",  yr:"RM19200", desc:"Advanced capabilities for high-volume firms requiring absolute data fidelity.",        pts:["Full Aequitas Ecosystem Access","Unlimited User Accounts","High-Velocity Priority Processing","Dedicated Account Curator"], feat:true, btn:"Start Free Trial" },
+  { title:"Standard",     mo:"RM1000",  yr:"RM9600",  desc:"Essential intelligence tools for boutique practices focused on precision.",           pts:["10GB Dedicated Storage","All Core Functions","All Marketplace Functions"],                                                            btn:"Start Free Trial" },
+  { title:"Professional", mo:"RM2000",  yr:"RM19200", desc:"Advanced capabilities for high-volume firms requiring absolute data fidelity.",        pts:["100GB Dedicated Storage","All Core Functions","Priority Marketplace Ranking"],                                         feat:true, btn:"Start Free Trial" },
   { title:"Academic",     mo:"Invited", yr:"Invited", desc:"Supporting the next generation of legal minds with free access to our primary database.", pts:["Academic Database Access","Campus-Wide IP Authentication"],                                                                       btn:"Request Access" },
 ];
 
@@ -694,6 +694,7 @@ function AequitasPage() {
 function PricingPage() {
   const [hov, setHov] = useState("Professional");
   const [bill, setBill] = useState<BillMode>("monthly");
+  const [planType, setPlanType] = useState<"individual" | "team">("individual");
   return (
     <main>
       <section className="phero wrap">
@@ -704,11 +705,19 @@ function PricingPage() {
           <SI d={240}><p className="hbody ctr">Empower your practice with 0-hallucination data. Select the toolset designed for your operational scale.</p></SI>
           <SI d={320}>
             <div className="btog">
-              <button className={`bbtn ${bill==="monthly"?"on":""}`} type="button" onClick={() => setBill("monthly")}>Monthly</button>
-              <button className={`bbtn ${bill==="annual"?"on":""}`} type="button" onClick={() => setBill("annual")}>Annual</button>
-              <span className="bnote">Save 20% annually</span>
+              <button className={`bbtn ${planType==="individual"?"on":""}`} type="button" onClick={() => setPlanType("individual")}>Individual</button>
+              <button className={`bbtn ${planType==="team"?"on":""}`} type="button" onClick={() => setPlanType("team")}>Team</button>
             </div>
           </SI>
+          {planType === "team" && (
+            <SI d={400}>
+              <div className="btog" style={{ marginTop:"0.75rem" }}>
+                <button className={`bbtn ${bill==="monthly"?"on":""}`} type="button" onClick={() => setBill("monthly")}>Monthly</button>
+                <button className={`bbtn ${bill==="annual"?"on":""}`} type="button" onClick={() => setBill("annual")}>Annual</button>
+                <span className="bnote">Save 20% annually</span>
+              </div>
+            </SI>
+          )}
         </div>
       </section>
 
@@ -718,34 +727,70 @@ function PricingPage() {
         <button className="lclaim" type="button">Claim Offer</button>
       </Reveal>
 
-      <Reveal className="pgrid wrap">
-        {pricingTiers.map(tier => {
-          const price = bill === "monthly" ? tier.mo : tier.yr;
-          const isRM = price.startsWith("RM");
-          const isHov = hov === tier.title;
-          return (
-            <article key={tier.title} className={`pc ${tier.feat?"feat":""} ${isHov?"hov":""}`}
-              onMouseEnter={() => setHov(tier.title)} onMouseLeave={() => setHov("Professional")}>
-              {tier.feat && <div className="rpill">Recommended</div>}
-              <div className="ptier">{tier.title}</div>
-              <div className="ppr">
-                {isRM ? (
-                  <>
-                    <span className="pcur">RM</span>
-                    <span className="pnum"><AnimPrice value={parseInt(price.replace("RM",""),10)} active={isHov}/></span>
-                    <span className="pper">{bill==="monthly"?"/mo":"/yr"}</span>
-                  </>
-                ) : <span className="pnum sm">{price}</span>}
-              </div>
-              {bill==="annual" && isRM && <p className="pann">~ {tier.mo}/month billed yearly</p>}
-              <p className="pdesc">{tier.desc}</p>
-              <ul className="pfeats">
-                {tier.pts.map(p => <li key={p}><span className="fd">◆</span>{p}</li>)}
-              </ul>
-              <MagBtn cls={tier.feat ? "bp" : "bo"}>{tier.btn}</MagBtn>
-            </article>
-          );
-        })}
+      {planType === "individual" ? (
+        <Reveal className="pgrid wrap" style={{ justifyContent:"center" } as CSSProperties}>
+          <article className="pc feat hov" style={{ maxWidth:"420px", margin:"0 auto" }}>
+            <div className="ptier">Individual</div>
+            <div className="ppr">
+              <span className="pcur">RM</span>
+              <span className="pnum">100</span>
+              <span className="pper">/mo</span>
+            </div>
+            <p className="pdesc">Full access to all Aequitas tools for individual practitioners — with dedicated storage included.</p>
+            <ul className="pfeats">
+              {[
+                "500MB Dedicated Storage",
+                "Aequitas ChatAPI Access",
+                "SPA Generation",
+                "Compliance Checks",
+                "All Core Functions",
+                "Marketplace Display Not Included",
+              ].map(p => <li key={p}><span className="fd">◆</span>{p}</li>)}
+            </ul>
+            <MagBtn cls="bp">Start Free Trial</MagBtn>
+          </article>
+        </Reveal>
+      ) : (
+        <Reveal className="pgrid wrap">
+          {pricingTiers.map(tier => {
+            const price = bill === "monthly" ? tier.mo : tier.yr;
+            const isRM = price.startsWith("RM");
+            const isHov = hov === tier.title;
+            return (
+              <article key={tier.title} className={`pc ${tier.feat?"feat":""} ${isHov?"hov":""}`}
+                onMouseEnter={() => setHov(tier.title)} onMouseLeave={() => setHov("Professional")}>
+                {tier.feat && <div className="rpill">Recommended</div>}
+                <div className="ptier">{tier.title}</div>
+                <div className="ppr">
+                  {isRM ? (
+                    <>
+                      <span className="pcur">RM</span>
+                      <span className="pnum">{parseInt(price.replace("RM",""),10).toLocaleString()}</span>
+                      <span className="pper">{bill==="monthly"?"/mo":"/yr"}</span>
+                    </>
+                  ) : <span className="pnum sm">{price}</span>}
+                </div>
+                {bill==="annual" && isRM && <p className="pann">~ {tier.mo}/month billed yearly</p>}
+                <p className="pdesc">{tier.desc}</p>
+                <ul className="pfeats">
+                  {tier.pts.map(p => <li key={p}><span className="fd">◆</span>{p}</li>)}
+                </ul>
+                <MagBtn cls={tier.feat ? "bp" : "bo"}>{tier.btn}</MagBtn>
+              </article>
+            );
+          })}
+        </Reveal>
+      )}
+
+      <Reveal className="wrap">
+        <div className="lstrip" style={{ flexDirection:"column", gap:"0.75rem", textAlign:"center", padding:"2.25rem 2rem" } as CSSProperties}>
+          <span className="ldot">◎</span>
+          <div className="lcopy" style={{ flexDirection:"column", gap:"0.25rem" } as CSSProperties}>
+            <strong>Beta Testing Now Open</strong>
+            <span>We are currently accepting beta testers. If you are interested, please reach out to us directly.</span>
+          </div>
+          <button className="lclaim" type="button">Contact Us</button>
+        </div>
       </Reveal>
 
       <Reveal className="faq wrap">
